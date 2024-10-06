@@ -68,30 +68,30 @@ void *listGet(List* l, int index)
 }
 
 
-int main(int argc, char *argv[])
-{
-    List* list = (List*)malloc(sizeof(List));
-    listInit(list, sizeof(int));
+// int main(int argc, char *argv[])
+// {
+//     List* list = (List*)malloc(sizeof(List));
+//     listInit(list, sizeof(int));
 
-    for (int i = 1; i <= 15; i++)
-    {
-        int* value = (int*)malloc(sizeof(int));
-        *value = i;
-        listAddEnd(list, value);
-    }
+//     for (int i = 1; i <= 15; i++)
+//     {
+//         int* value = (int*)malloc(sizeof(int));
+//         *value = i;
+//         listAddEnd(list, value);
+//     }
 
-    for (int i = 0; i < 15; i++)
-    {
-       printf("%d\n", *(int*)*(int**)listGet(list, i));
-    }
+//     for (int i = 0; i < 15; i++)
+//     {
+//        printf("%d\n", *(int*)*(int**)listGet(list, i));
+//     }
 
-    for (int i = 0; i < list->size; i++)
-    {
-        free (*(int**)listGet(list, i));
-    }
+//     for (int i = 0; i < list->size; i++)
+//     {
+//         free (*(int**)listGet(list, i));
+//     }
 
-    free(list->data);
-    free(list);
+//     free(list->data);
+//     free(list);
     
-    return 0;
-}
+//     return 0;
+// }

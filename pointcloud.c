@@ -1,7 +1,9 @@
 // Author Thomas Olson - olsoto@iastate.edu
 #include <stdio.h>
 #include <float.h>
+#include <stdlib.h>
 #include "pointcloud.h"
+#include "util.h"
 
 /* stat1(FILE *file)
     takes an open file pointer with point cloud data (doubles x,y,height)
@@ -10,7 +12,44 @@
     iterates through the file, updating minimum and maximum heights with their
     coordinates while summing up the heights to calculate the average
 */
-void stat1(FILE *file)
+void* readPointCloudData(FILE *stream)
+{
+    List* list = (List*)malloc(sizeof(List));
+    listInit(list, sizeof(pcd_t));
+    int columns;
+    fscanf(stream, "%d", &columns);
+    for (int i = 0; i < columns; i++){
+            double x;
+            double y;
+            double h;
+            fscanf(stream, "%lf %lf %lf", &x, &y, &h);
+            pcd_t* point = malloc(sizeof(pcd_t));
+            point->x = x;
+            point->y = y;
+            point->z = h;
+            // printf("%lf %lf %lf", point->x, point->y, point->z);
+            // printf("\n");
+
+            point->water_amt = 0;
+            // point->north->NULL;
+            // point->east->NULL;
+            // point->south->NULL;
+            // point->west->NULL;
+            listAddEnd(list, point);
+    }
+
+    for (int i = 0; i < columns; i++)
+    {
+        pcd_t* point = *(pcd_t**)listGet(list, i);
+
+       printf("%lf %lf %lf\n", point->x, point->y, point->z);
+    }
+
+
+    return (void*)list;
+}
+
+void stat1(List* l)
 {
 
     double x;
@@ -24,7 +63,12 @@ void stat1(FILE *file)
     int count = 0;
     
     
-    while (fscanf(file, "%lf %lf %lf", &x, &y, &h) == 3){
+    for (int i = 0; i < l->size ; i++)
+    {
+        pcd_t* point = *(pcd_t**)listGet(l, i);
+        h = point->z;
+        x = point->x;
+        y = point->y;
         if (h < minHeight){
             minHeight = h;
             minCoords[0] = x;
@@ -65,8 +109,19 @@ int main(int argc, char *argv[])
     }
 
     printf("Processing point cloud data from %s\n", argv[1]);
-    stat1(file);
+    
+    List* l = (List*)readPointCloudData(file);
+
+    stat1(l);
+
     fclose(file);
+
+    for (int i = 0; i < l->size; i++)
+    {
+        free ((pcd_t*)listGet(l, i));
+    }
+    free(l->data);
+    free(l);
 
     return 0;
 }

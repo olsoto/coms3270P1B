@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "pointcloud.h"
 #include "util.h"
+#include "bmp.h"
 
 /* stat1(FILE *file)
     takes an open file pointer with point cloud data (doubles x,y,height)
@@ -12,12 +13,68 @@
     iterates through the file, updating minimum and maximum heights with their
     coordinates while summing up the heights to calculate the average
 */
-void* readPointCloudData(FILE *stream)
+
+void imagePointCloud(List* l, int width, char* filename)
 {
-    List* list = (List*)malloc(sizeof(List));
+    if (l==NULL){
+        printf("LIST FAILED");
+        return;
+    }
+
+    double heightPair[2];
+    stat1(l, heightPair);
+
+    double range = heightPair[1] - heightPair[0];
+    //int lengths = (int)(range / 256);
+    int height = l->size/width;
+    //Bitmap* bitmap = malloc(sizeof(bitmap));
+    Bitmap *bitmap = bm_create(width, height);
+
+   
+    if (!bitmap){
+        printf("BITMAP FAILED");
+        return;
+    }
+    
+    double rgb;
+    unsigned int color = 0x0;
+
+    int x = 0;
+    int y = 0;
+
+    for (int i = 0; i < l->size; i++)
+    {
+        pcd_t* point = *(pcd_t**)listGet(l, i);
+
+        rgb = ((point->z - heightPair[0]) / range)*256.0;
+        color = (0xFF000000) | ((int)rgb << 16) | ((int)rgb << 8) | ((int)rgb);
+
+        bm_set_color(bitmap, color);
+
+        if (x < width){
+            bm_putpixel(bitmap, x, y);
+        }else if (x >= width)
+        {
+            y++;
+            x=0;
+            bm_putpixel(bitmap, x, y);
+        }
+        //printf("x:%d y:%d\n", x, y);
+        x++;
+    }
+    bm_save(bitmap, filename);
+    bm_free(bitmap);
+    
+
+    //printf("min %lf max %lf\n", heightPair[0], heightPair[1]);
+}
+
+void readPointCloudData(FILE *stream, int *rasterWidth, List* list)
+{
     listInit(list, sizeof(pcd_t));
     int columns;
     fscanf(stream, "%d", &columns);
+    *rasterWidth = columns;
     for (int i = 0; i < columns; i++){
             double x;
             double y;
@@ -42,14 +99,14 @@ void* readPointCloudData(FILE *stream)
     {
         pcd_t* point = *(pcd_t**)listGet(list, i);
 
-       printf("%lf %lf %lf\n", point->x, point->y, point->z);
+       //printf("%lf %lf %lf\n", point->x, point->y, point->z);
     }
 
 
-    return (void*)list;
+    //return (void*)list;
 }
 
-void stat1(List* l)
+void stat1(List* l, double pair[2])
 {
 
     double x;
@@ -61,6 +118,7 @@ void stat1(List* l)
     double maxCoords [2];
     double totalHeight = 0.0;
     int count = 0;
+    
     
     
     for (int i = 0; i < l->size ; i++)
@@ -84,6 +142,9 @@ void stat1(List* l)
     }
 
     double averageHeight = (count > 0)?(totalHeight/count):0;
+    pair[0] = minHeight;
+    pair[1] = maxHeight;
+    
     
     printf("Minimum Height: %lf at coordinates %lf, %lf\n", minHeight, minCoords[0], minCoords[1]);
     printf("Maximum Height: %lf at coordinates %lf, %lf\n", maxHeight, maxCoords[0], maxCoords[1]);
@@ -95,33 +156,3 @@ void stat1(List* l)
         and calls the stat1 function
 */
 
-int main(int argc, char *argv[])
-{
-    if (argc < 2){
-        printf("Usage: %s <filename>\n", argv[0]);
-    }
-
-    FILE *file = fopen(argv[1], "r");
-
-    if (file == NULL){
-        printf("Error, could not open file %s\n", argv[1]);
-        return 1;
-    }
-
-    printf("Processing point cloud data from %s\n", argv[1]);
-    
-    List* l = (List*)readPointCloudData(file);
-
-    stat1(l);
-
-    fclose(file);
-
-    for (int i = 0; i < l->size; i++)
-    {
-        free ((pcd_t*)listGet(l, i));
-    }
-    free(l->data);
-    free(l);
-
-    return 0;
-}

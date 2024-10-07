@@ -1,13 +1,16 @@
 #ifndef POINTCLOUD_H
 #define POINTCLOUD_H
 #include "util.h"
+#include "bmp.h"
 
 #include <stdio.h>
 
 //prototype for the stat1 function from the pointcloud.c file
-void stat1(List* list);
+void stat1(List* list, double pair[2]);
+void readPointCloudData(FILE *stream, int *rasterWidth, List* pc);
 
-void* readPointCloudData(FILE *stream);
+
+void imagePointCloud(List* l, int width, char* filename);
 
 typedef struct pcd pcd_t;
 

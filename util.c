@@ -48,7 +48,7 @@ void listAddEnd(List* l, void* elmt)
 
     //destination = elmt;
 
-    memcpy(destination, &elmt, l->max_element_size);
+    memcpy(destination, elmt, l->max_element_size);
 
     l->size++;
 

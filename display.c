@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     printf("Processing point cloud data from %s\n", argv[1]);
     
     List* l = (List*)malloc(sizeof(List));
+    listInit(l, sizeof(pcd_t));
     int width; 
     readPointCloudData(file, &width, l);
 

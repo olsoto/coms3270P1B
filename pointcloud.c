@@ -23,16 +23,28 @@ void imagePointCloud(List* l, int width, char* filename)
 
     double heightPair[2];
     stat1(l, heightPair);
+    // printf("%lf\n", heightPair[1]);
+    // printf("%lf\n", heightPair[0]);
 
     double range = heightPair[1] - heightPair[0];
+
+    // printf("%lf\n", range);
+
+    if (range == 0){
+        range = 1;
+    }
+
     //int lengths = (int)(range / 256);
-    int height = l->size/width;
+    int height = l->size / width;
+    if (l->size % width != 0){
+        height++;
+    }
     //Bitmap* bitmap = malloc(sizeof(bitmap));
     Bitmap *bitmap = bm_create(width, height);
 
    
     if (!bitmap){
-        printf("BITMAP FAILED");
+        printf("BITMAP MALLOC FAILED");
         return;
     }
     
@@ -44,23 +56,31 @@ void imagePointCloud(List* l, int width, char* filename)
 
     for (int i = 0; i < l->size; i++)
     {
-        pcd_t* point = *(pcd_t**)listGet(l, i);
+        pcd_t* point = (pcd_t*)listGet(l, i);
 
-        rgb = ((point->z - heightPair[0]) / range)*256.0;
+        rgb = ((point->z - heightPair[0]) / range)*255.0;
+
+        if (rgb < 0) {
+            rgb = 0;
+        } else if (rgb > 255) {
+            rgb = 255;
+        }
+
         color = (0xFF000000) | ((int)rgb << 16) | ((int)rgb << 8) | ((int)rgb);
 
         bm_set_color(bitmap, color);
+    //printf("Point %d: x=%f, y=%f, z=%f, rgb=%f\n", i, point->x, point->y, point->z, rgb);
 
-        if (x < width){
-            bm_putpixel(bitmap, x, y);
-        }else if (x >= width)
+        bm_putpixel(bitmap, y, x);
+        x++;
+        if (x >= width)
         {
             y++;
             x=0;
-            bm_putpixel(bitmap, x, y);
+            
         }
         //printf("x:%d y:%d\n", x, y);
-        x++;
+        
     }
     bm_save(bitmap, filename);
     bm_free(bitmap);
@@ -71,36 +91,44 @@ void imagePointCloud(List* l, int width, char* filename)
 
 void readPointCloudData(FILE *stream, int *rasterWidth, List* list)
 {
-    listInit(list, sizeof(pcd_t));
-    int columns;
-    fscanf(stream, "%d", &columns);
-    *rasterWidth = columns;
-    for (int i = 0; i < columns; i++){
-            double x;
-            double y;
-            double h;
-            fscanf(stream, "%lf %lf %lf", &x, &y, &h);
-            pcd_t* point = malloc(sizeof(pcd_t));
-            point->x = x;
-            point->y = y;
-            point->z = h;
+    if (!stream){
+        fprintf(stderr, "No stream to read");
+        return;
+    }
+
+
+    
+    fscanf(stream, "%d", rasterWidth);
+
+        double x;
+        double y;
+        double h;
+        pcd_t point;
+    
+    while (fscanf(stream, "%lf %lf %lf", &x, &y, &h) == 3){
+
+            
+            //pcd_t* point = malloc(sizeof(pcd_t));
+            point.x = x;
+            point.y = y;
+            point.z = h;
             // printf("%lf %lf %lf", point->x, point->y, point->z);
             // printf("\n");
 
-            point->water_amt = 0;
+            point.water_amt = 0;
             // point->north->NULL;
             // point->east->NULL;
             // point->south->NULL;
             // point->west->NULL;
-            listAddEnd(list, point);
+            listAddEnd(list, &point);
     }
 
-    for (int i = 0; i < columns; i++)
-    {
-        pcd_t* point = *(pcd_t**)listGet(list, i);
+    // for (int i = 0; i < columns; i++)
+    // {
+    //     pcd_t* point = *(pcd_t**)listGet(list, i);
 
-       //printf("%lf %lf %lf\n", point->x, point->y, point->z);
-    }
+    //    //printf("%lf %lf %lf\n", point->x, point->y, point->z);
+    // }
 
 
     //return (void*)list;
@@ -123,7 +151,7 @@ void stat1(List* l, double pair[2])
     
     for (int i = 0; i < l->size ; i++)
     {
-        pcd_t* point = *(pcd_t**)listGet(l, i);
+        pcd_t* point = (pcd_t*)listGet(l, i);
         h = point->z;
         x = point->x;
         y = point->y;

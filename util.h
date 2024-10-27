@@ -1,3 +1,4 @@
+// util.h - header file for utility functions and List structure
 #ifndef UTIL_H
 #define UTIL_H
 

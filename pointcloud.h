@@ -1,3 +1,7 @@
+/**
+ * pointcloud.h - header file for point cloud processing functions and structures.
+ */
+
 #ifndef POINTCLOUD_H
 #define POINTCLOUD_H
 #include "util.h"
@@ -14,12 +18,13 @@ void imagePointCloud(List* l, int width, char* filename);
 
 typedef struct pcd pcd_t;
 
+//structure representing a point in the cloud
 typedef struct pcd{
-    double x;
-    double y;
+    double x;   //coordinate x
+    double y;   //copordinate y
     double z; //height
-    double water_amt;
-    struct pcd* north;
+    double water_amt;   // placeholder for water amount
+    struct pcd* north;  //spatial references (not used in part B)
     struct pcd* south;
     struct pcd* east;
     struct pcd* west;

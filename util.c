@@ -1,7 +1,17 @@
+// util.c - utility functions for handlingn dynamic lists
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "util.h"
+
+/**
+ * allocateArray - allocates a 2D array of doubles with given dimensions
+ * @param rows: Number of rows
+ * @param columns: Number of columns
+ * @return: Pointer to the allocated array
+ */
 
 void *allocateArray(int rows, int columns){
     double* array = (double*)calloc(rows*columns, sizeof(double));
@@ -9,6 +19,12 @@ void *allocateArray(int rows, int columns){
     return (void*)array;
 }
 
+/**
+ * listInit - initializes a List structure
+ * @param l: pointer to List to initialize
+ * @param max_elmt_size: Maimum size of an element in the List
+ * @return: 0 on success, -1 on failure.
+ */
 int listInit(List* l, int max_elmt_size)
 {
     l->max_size = 10;
@@ -34,6 +50,11 @@ typedef struct
 
 */
 
+/**
+ * listAddEnd - adds an element to the end of the List
+ * @param l: Poinetr to List
+ * @param elmt: Pointer to element to add
+ */
 void listAddEnd(List* l, void* elmt)
 {
     if (l->size == l->max_size){
@@ -54,6 +75,14 @@ void listAddEnd(List* l, void* elmt)
 
     //l->(void*)(data+(size * max_element_size))->elmt;
 }
+
+
+/**
+ * listGet - retrieves an element by index
+ * @param l: Pointer to Lis
+ * @param index: Index of the element to retrieve.
+ * @return: Pointer to the element or NULL if index is out of bounds.
+ */
 
 void *listGet(List* l, int index)
 {

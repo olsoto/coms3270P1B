@@ -1,4 +1,13 @@
 // Author Thomas Olson - olsoto@iastate.edu
+/**
+ * pointcloud.c - Core functionalities for processing and visualizing point cloud data.
+ * 
+ * Functions:
+ * - imagePointCloud: Generates an image file visualizing point cloud data.
+ * - readPointCloudData: Reads point cloud data from a file.
+ * - stat1: Calculates minimum, maximum, and average heights in the point cloud.
+ */
+
 #include <stdio.h>
 #include <float.h>
 #include <stdlib.h>
@@ -6,14 +15,14 @@
 #include "util.h"
 #include "bmp.h"
 
-/* stat1(FILE *file)
-    takes an open file pointer with point cloud data (doubles x,y,height)
-    prints the minimum and maximum heights with their coordinates and
-    the average height of all the points
-    iterates through the file, updating minimum and maximum heights with their
-    coordinates while summing up the heights to calculate the average
-*/
 
+
+/**
+ * imagePointCloud - Creates a grayscale image representing point cloud height.
+ * @param l: Pointer to the List containing point cloud data.
+ * @param width: The width of the generated image.
+ * @param filename: Name of the output image file.
+ */
 void imagePointCloud(List* l, int width, char* filename)
 {
     if (l==NULL){
@@ -54,6 +63,7 @@ void imagePointCloud(List* l, int width, char* filename)
     int x = 0;
     int y = 0;
 
+    //map each point's height to grayscale and plot on bitmap
     for (int i = 0; i < l->size; i++)
     {
         pcd_t* point = (pcd_t*)listGet(l, i);
@@ -71,7 +81,7 @@ void imagePointCloud(List* l, int width, char* filename)
         bm_set_color(bitmap, color);
     //printf("Point %d: x=%f, y=%f, z=%f, rgb=%f\n", i, point->x, point->y, point->z, rgb);
 
-        bm_putpixel(bitmap, y, x);
+        bm_putpixel(bitmap, x, y);
         x++;
         if (x >= width)
         {
@@ -88,6 +98,14 @@ void imagePointCloud(List* l, int width, char* filename)
 
     //printf("min %lf max %lf\n", heightPair[0], heightPair[1]);
 }
+
+
+/**
+ * readPointCloudData - Reads point cloud data from a file and stores it in a List.
+ * @param stream: File stream to read from.
+ * @param rasterWidth: Pointer to an int storing raster width.
+ * @param list: Pointer to List to store read points.
+ */
 
 void readPointCloudData(FILE *stream, int *rasterWidth, List* list)
 {
@@ -133,6 +151,14 @@ void readPointCloudData(FILE *stream, int *rasterWidth, List* list)
 
     //return (void*)list;
 }
+
+/* stat1(FILE *file)
+    takes an open file pointer with point cloud data (doubles x,y,height)
+    prints the minimum and maximum heights with their coordinates and
+    the average height of all the points
+    iterates through the file, updating minimum and maximum heights with their
+    coordinates while summing up the heights to calculate the average
+*/
 
 void stat1(List* l, double pair[2])
 {

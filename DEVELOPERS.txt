@@ -1,0 +1,76 @@
+Author: Thomas Olson - olsoto@iastate.edu
+Project: COM S 3270 Part 1 B - Advanced Point Cloud Data Processing and Visualization
+
+Overview of Files and Functions
+
+display.c (Main Source File)
+This file contains the main function that serves as the entry point for the program. It reads point cloud data from a specified file, calculates height-related statistics, and generates a grayscale image representing the heights.
+
+main(int argc, char *argv[])
+Description: Manages command-line input, initializes structures, reads point cloud data, and invokes visualization functions.
+Inputs:
+argc: Number of command-line arguments.
+argv: Array of command-line arguments, where argv[1] is expected to be the input file name.
+Outputs:
+Prints usage instructions if no file is provided.
+Prints error messages if the file cannot be opened.
+Processes and visualizes the point cloud data using helper functions.
+Logic: Verifies the presence of a file argument, opens the file, initializes a dynamic list (List) to store points, calls readPointCloudData and imagePointCloud, then cleans up resources before exiting.
+
+pointcloud.c (Core Processing File)
+This file contains primary functions for handling point cloud data processing and generating a bitmap image to represent height variations.
+
+imagePointCloud(List* l, int width, char* filename)
+Description: Generates a grayscale image where each point's intensity represents its height.
+Inputs:
+l: Pointer to the List containing point cloud data.
+width: Width of the output image.
+filename: Path for saving the generated image.
+Outputs: Saves the grayscale image to filename.
+Logic: Maps point heights to grayscale values, determines pixel placement, and saves the image using bm_save.
+
+readPointCloudData(FILE *stream, int rasterWidth, List list)
+Description: Reads point cloud data from a file and populates the List.
+Inputs:
+stream: Open file stream for reading.
+rasterWidth: Pointer to an integer storing raster width.
+list: Pointer to a List for storing points.
+Outputs: Populates the list with points read from the file.
+Logic: Reads coordinates and height values, storing them in the List.
+
+stat1(List* l, double pair[2])
+Description: Calculates minimum, maximum, and average heights in the point cloud.
+Inputs:
+l: Pointer to List containing points.
+pair: Array for storing min and max height values.
+Outputs: Prints min and max heights with coordinates, and average height.
+Logic: Iterates through each point, tracking min and max heights, then calculates the average.
+
+pointcloud.h
+Defines the pcd_t structure, which represents a single point in the point cloud. It includes coordinates (x, y, z), water level (for potential extensions), and pointers for potential neighbor relationships (north, south, east, west).
+
+Struct pcd_t
+Attributes:
+x, y, z: Coordinates and height.
+water_amt: Placeholder for water amount (unused currently).
+Neighbor pointers (north, south, east, west) for potential extensions.
+
+util.c and util.h (Utility File and Header)
+Provides support functions for dynamic list operations to store and access point data.
+
+allocateArray(int rows, int columns)
+Description: Allocates a 2D array for temporary data storage.
+
+listInit(List* l, int max_elmt_size)
+Description: Initializes a List with specified element size.
+
+listAddEnd(List* l, void* elmt)
+Description: Appends an element to the end of the List.
+
+listGet(List* l, int index)
+Description: Retrieves an element from List by index.
+
+Notes for Future Developers
+Memory Management: Ensure all allocated resources are freed at the end of each function to prevent memory leaks.
+Extensibility: Consider adding support for north, south, east, and west pointers for more complex spatial relationships.
+Testing: Recommended to test with various rasterWidth values to ensure image scaling functions correctly.

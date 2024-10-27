@@ -2,6 +2,9 @@
 Author : Thomas Olson -olsoto@iastate.edu
 Part B - Advanced Point Cloud Data Processor
 
+************************
+KNOWN ERROR: Segmentation fault (likely memory leak) that I have been unable to identify... The code works correctly and performs the operations but segmentation failure occurs after attempting to free memory.
+
 Description
 This project is an extension of Part A, focusing on additional features for visualizing point cloud data. The application reads data from an ASCII file, processes it to compute height statistics, and visualizes it as a grayscale bitmap image, with intensity levels representing height variations.
 

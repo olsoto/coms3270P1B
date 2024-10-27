@@ -47,12 +47,12 @@ int main(int argc, char *argv[])
     //clean up allocated resources
     fclose(file);
 
-    for (int i = 0; i < l->size; i++)
-    {
-        free ((pcd_t*)listGet(l, i));
-    }
-    free(l->data);
-    free(l);
+    // for (int i = 0; i < l->size; i++)
+    // {
+    //     free ((pcd_t*)listGet(l, i));
+    // }
+    // free(l->data);
+    // free(l);
 
     return 0;
 }
